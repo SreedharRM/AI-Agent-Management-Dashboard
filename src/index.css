@@ -2350,9 +2350,6 @@
     color: var(--primary);
   }
 
-  .text-primary-foreground {
-    color: var(--primary-foreground);
-  }
 
   .text-purple-500 {
     color: var(--color-purple-500);
@@ -3214,12 +3211,6 @@
       .hover\:to-purple-500\/5:hover {
         --tw-gradient-to: color-mix(in oklab, var(--color-purple-500) 5%, transparent);
       }
-    }
-  }
-
-  @media (hover: hover) {
-    .hover\:text-accent-foreground:hover {
-      color: var(--accent-foreground);
     }
   }
 

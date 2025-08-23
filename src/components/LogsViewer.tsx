@@ -188,14 +188,7 @@ export function LogsViewer({ searchQuery = '', workflowFilter = '' }: LogsViewer
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h3 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Activity Timeline
-          </h3>
-          <p className="text-muted-foreground">
-            {filteredLogs.length} of {mockLogs.length} events
-          </p>
-        </div>
+
         
         <div className="flex gap-2">
           <Button
