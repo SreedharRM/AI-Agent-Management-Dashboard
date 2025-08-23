@@ -56,7 +56,7 @@ export function AgentCard({
 
   const handleAssignTask = () => {
     if (onNavigate) {
-      onNavigate('tasks');
+      onNavigate('mail');
     }
   };
 
@@ -163,7 +163,7 @@ export function AgentCard({
               className="flex-1 gradient-primary text-white border-0 hover:opacity-90 transition-all duration-200 hover:scale-105"
               onClick={handleAssignTask}
             >
-              Assign Task
+              Open Mail
             </Button>
           </motion.div>
         </CardContent>
