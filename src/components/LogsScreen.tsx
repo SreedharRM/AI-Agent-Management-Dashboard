@@ -1,61 +1,121 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { LogsViewer } from './LogsViewer';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Badge } from './ui/badge';
-import { Search, Calendar, Download, RefreshCw, Activity, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Search, Download, RefreshCw, Activity, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 interface LogsScreenProps {
   onNavigate?: (screen: string) => void;
 }
 
 export function LogsScreen({ onNavigate }: LogsScreenProps) {
+  const taskList = useQuery(api.tasks.getAllTasks);
+  const tasks = taskList ?? [];
+
   const [workflowFilter, setWorkflowFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('today');
   const [searchQuery, setSearchQuery] = useState('');
+  const [logsByTask, setLogsByTask] = useState<{ [key: string]: any[] }>({});
+  const [loading, setLoading] = useState(false);
+
+  const fetchLogs = useCallback(async () => {
+    if (!tasks || tasks.length === 0) return;
+    setLoading(true);
+
+    const results: { [key: string]: any[] } = {};
+    await Promise.all(
+      tasks.map(async (task: any) => {
+        try {
+          const res = await fetch(`http://localhost:8000/tasks/${task.taskId}/logs`);
+          if (!res.ok) throw new Error(`Failed logs for ${task.taskId}`);
+          const data = await res.json();
+          results[task._id] = data;
+        } catch (err) {
+          console.error(err);
+          results[task._id] = [];
+        }
+      })
+    );
+
+    setLogsByTask(results);
+    setLoading(false);
+  }, [tasks]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [tasks, fetchLogs]);
 
   const workflows = [
     'All Workflows',
-    'Invoice Processing', 
+    'Invoice Processing',
     'Sales Automation',
     'Lead Upload',
     'Data Sync',
     'Email Marketing'
   ];
 
-  const stats = [
-    {
-      label: 'Total Events',
-      value: '1,247',
-      icon: Activity,
-      color: 'text-blue-600',
-      gradient: 'gradient-primary'
-    },
-    {
-      label: 'Self-Healed',
-      value: '23',
-      icon: Zap,
-      color: 'text-yellow-600',
-      gradient: 'gradient-warning'
-    },
-    {
-      label: 'Errors',
-      value: '5',
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      gradient: 'gradient-danger'
-    },
-    {
-      label: 'Success Rate',
-      value: '96.1%',
-      icon: CheckCircle,
-      color: 'text-green-600',
-      gradient: 'gradient-success'
-    }
-  ];
+  // 🔹 Compute stats dynamically from logs
+  const computeStats = (logs: { [key: string]: any[] }) => {
+    const allLogs = Object.values(logs).flat();
+
+    const totalEvents = allLogs.length;
+    const errors = allLogs.filter(log => log.level === "error").length;
+    const selfHealed = allLogs.filter(log => log.status === "self-healed").length;
+    const successCount = allLogs.filter(log => log.status === "success").length;
+    const successRate = totalEvents > 0 ? ((successCount / totalEvents) * 100).toFixed(1) + "%" : "0%";
+
+    return [
+      {
+        label: 'Total Events',
+        value: totalEvents.toString(),
+        icon: Activity,
+        color: 'text-blue-600',
+        gradient: 'gradient-primary'
+      },
+      {
+        label: 'Self-Healed',
+        value: selfHealed.toString(),
+        icon: Zap,
+        color: 'text-yellow-600',
+        gradient: 'gradient-warning'
+      },
+      {
+        label: 'Errors',
+        value: errors.toString(),
+        icon: AlertTriangle,
+        color: 'text-red-600',
+        gradient: 'gradient-danger'
+      },
+      {
+        label: 'Success Rate',
+        value: successRate,
+        icon: CheckCircle,
+        color: 'text-green-600',
+        gradient: 'gradient-success'
+      }
+    ];
+  };
+
+  // 🔹 Full-screen loading screen
+// 🔹 Full-screen spinner loader
+if (loading) {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-blue-950 dark:to-purple-950">
+      <div className="flex flex-col items-center gap-4">
+        {/* Spinner */}
+        <div className="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="text-lg font-medium text-muted-foreground">
+          Fetching logs and generating stats...
+        </p>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-blue-950 dark:to-purple-950">
@@ -81,9 +141,15 @@ export function LogsScreen({ onNavigate }: LogsScreenProps) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Button variant="outline" size="sm" className="gap-2 hover:bg-blue-50 hover:border-blue-200">
-              <RefreshCw className="w-4 h-4" />
-              Refresh
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 hover:bg-blue-50 hover:border-blue-200"
+              onClick={fetchLogs}
+              disabled={loading}
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              {loading ? "Refreshing..." : "Refresh"}
             </Button>
             <Button variant="outline" size="sm" className="gap-2 hover:bg-green-50 hover:border-green-200">
               <Download className="w-4 h-4" />
@@ -94,7 +160,7 @@ export function LogsScreen({ onNavigate }: LogsScreenProps) {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {stats.map((stat, index) => {
+          {computeStats(logsByTask).map((stat, index) => {
             const Icon = stat.icon;
             return (
               <motion.div
@@ -201,6 +267,7 @@ export function LogsScreen({ onNavigate }: LogsScreenProps) {
               <LogsViewer 
                 searchQuery={searchQuery}
                 workflowFilter={workflowFilter}
+                logs={logsByTask}
               />
             </CardContent>
           </Card>

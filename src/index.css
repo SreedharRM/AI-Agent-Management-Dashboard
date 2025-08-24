@@ -2302,9 +2302,6 @@
     white-space: pre-wrap;
   }
 
-  .text-accent-foreground {
-    color: var(--accent-foreground);
-  }
 
   .text-blue-500 {
     color: var(--color-blue-500);
@@ -3221,22 +3218,11 @@
   }
 
   @media (hover: hover) {
-    .hover\:text-foreground:hover {
-      color: var(--foreground);
-    }
-  }
-
-  @media (hover: hover) {
     .hover\:text-muted-foreground:hover {
       color: var(--muted-foreground);
     }
   }
 
-  @media (hover: hover) {
-    .hover\:text-primary-foreground:hover {
-      color: var(--primary-foreground);
-    }
-  }
 
   @media (hover: hover) {
     .hover\:text-red-700:hover {
@@ -3244,11 +3230,6 @@
     }
   }
 
-  @media (hover: hover) {
-    .hover\:text-sidebar-accent-foreground:hover {
-      color: var(--sidebar-accent-foreground);
-    }
-  }
 
   @media (hover: hover) {
     .hover\:text-yellow-400:hover {
@@ -3331,9 +3312,6 @@
     background-color: var(--primary);
   }
 
-  .focus\:text-accent-foreground:focus {
-    color: var(--accent-foreground);
-  }
 
   .focus\:text-primary-foreground:focus {
     color: var(--primary-foreground);
@@ -3533,9 +3511,6 @@
     background-color: var(--primary);
   }
 
-  .aria-selected\:text-accent-foreground[aria-selected="true"] {
-    color: var(--accent-foreground);
-  }
 
   .aria-selected\:text-muted-foreground[aria-selected="true"] {
     color: var(--muted-foreground);
@@ -3576,9 +3551,6 @@
     font-weight: var(--font-weight-medium);
   }
 
-  .data-\[active\=true\]\:text-accent-foreground[data-active="true"] {
-    color: var(--accent-foreground);
-  }
 
   .data-\[active\=true\]\:text-sidebar-accent-foreground[data-active="true"] {
     color: var(--sidebar-accent-foreground);
@@ -3770,9 +3742,7 @@
     background-color: var(--accent);
   }
 
-  .data-\[selected\=true\]\:text-accent-foreground[data-selected="true"] {
-    color: var(--accent-foreground);
-  }
+ 
 
   .data-\[side\=bottom\]\:translate-y-1[data-side="bottom"] {
     --tw-translate-y: calc(var(--spacing) * 1);
@@ -3943,9 +3913,6 @@
     background-color: var(--accent);
   }
 
-  .data-\[state\=on\]\:text-accent-foreground[data-state="on"] {
-    color: var(--accent-foreground);
-  }
 
   .data-\[state\=open\]\:animate-accordion-down[data-state="open"] {
     animation: accordion-down var(--tw-duration, .2s) ease-out;
@@ -3973,9 +3940,6 @@
     background-color: var(--secondary);
   }
 
-  .data-\[state\=open\]\:text-accent-foreground[data-state="open"] {
-    color: var(--accent-foreground);
-  }
 
   .data-\[state\=open\]\:text-muted-foreground[data-state="open"] {
     color: var(--muted-foreground);
@@ -5217,7 +5181,7 @@
 
   @media (hover: hover) {
     a.\[a\&\]\:hover\:bg-primary\/90:hover {
-      background-color: var(--primary);
+      background-color: var(--secondary);
     }
 
     @supports (color: color-mix(in lab, red, red)) {
@@ -5239,11 +5203,6 @@
     }
   }
 
-  @media (hover: hover) {
-    a.\[a\&\]\:hover\:text-accent-foreground:hover {
-      color: var(--accent-foreground);
-    }
-  }
 }
 
 :root {
@@ -5285,7 +5244,7 @@
   --sidebar-accent-foreground: oklch(.205 0 0);
   --sidebar-border: oklch(.922 0 0);
   --sidebar-ring: oklch(.708 0 0);
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-primary: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
   --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --gradient-success: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
   --gradient-warning: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);

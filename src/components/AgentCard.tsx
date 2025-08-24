@@ -1,14 +1,15 @@
+// AgentCard.tsx
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
-import { Activity, Zap, AlertCircle, Bot } from 'lucide-react';
+import { Activity, Zap, Bot } from 'lucide-react';
 import { motion } from 'motion/react';
 
-type AgentStatus = 'active' | 'running' | 'failed';
+export type AgentStatus = 'active' | 'running' | 'failed';
 
-interface AgentCardProps {
+export interface AgentCardProps {
   name?: string;
   status?: AgentStatus;
   currentTask?: string;

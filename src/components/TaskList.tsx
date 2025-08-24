@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { MoreHorizontal, Play, FileText, Zap, CheckCircle, X, Clock, AlertTriangle } from 'lucide-react';
+import { MoreHorizontal, Play, FileText, Zap, CheckCircle, X, Clock, AlertTriangle, CheckSquare } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,9 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { motion, AnimatePresence } from 'motion/react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export type TaskStatus = 'pending' | 'in-progress' | 'self-healed' | 'completed' | 'failed';
 
@@ -61,49 +63,6 @@ const statusConfig = {
   }
 };
 
-const mockTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Upload lead list to Outreach',
-    status: 'completed',
-    source: 'Email',
-    lastUpdated: '2m ago',
-    type: 'Sales'
-  },
-  {
-    id: '2',
-    title: 'Pay contractor invoice',
-    status: 'self-healed',
-    source: 'Nozomio',
-    lastUpdated: '5m ago',
-    type: 'Finance'
-  },
-  {
-    id: '3',
-    title: 'Update Outreach sequence',
-    status: 'failed',
-    source: 'Manual',
-    lastUpdated: '8m ago',
-    type: 'Sales'
-  },
-  {
-    id: '4',
-    title: 'Process new contractor onboarding',
-    status: 'in-progress',
-    source: 'Dedalus',
-    lastUpdated: '12m ago',
-    type: 'HR'
-  },
-  {
-    id: '5',
-    title: 'Send welcome email sequence',
-    status: 'pending',
-    source: 'AgentMail',
-    lastUpdated: '15m ago',
-    type: 'Marketing'
-  }
-];
-
 interface TaskListProps {
   showFailed?: boolean;
   showSelfHealed?: boolean;
@@ -111,7 +70,24 @@ interface TaskListProps {
 }
 
 export function TaskList({ showFailed = true, showSelfHealed = true, onNavigate }: TaskListProps) {
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const taskList = useQuery(api.tasks.getAllTasks);
+
+  // Normalize Convex tasks into UI-friendly Task[]
+  const normalizedTasks: Task[] = (taskList ?? []).map((t: any) => ({
+    id: t._id,
+    title: t.type === "contractor_onboarding" ? "Process new contractor onboarding" : t.type,
+    status: t.status as TaskStatus,
+    source: t.data?.repId || "System",
+    lastUpdated: new Date(t.createdAt).toLocaleString(),
+    type: t.type,
+  }));
+
+  const [tasks, setTasks] = useState<Task[]>(normalizedTasks);
+
+  // Keep local state in sync with Convex whenever taskList changes
+  useEffect(() => {
+    setTasks(normalizedTasks);
+  }, [taskList]);
 
   const filteredTasks = tasks.filter(task => {
     if (!showFailed && task.status === 'failed') return false;
@@ -152,9 +128,7 @@ export function TaskList({ showFailed = true, showSelfHealed = true, onNavigate 
         <TableBody>
           <AnimatePresence>
             {filteredTasks.map((task, index) => {
-              const statusInfo = statusConfig[task.status];
-              const StatusIcon = statusInfo.icon;
-              
+              const statusInfo = statusConfig[task.status as TaskStatus] ?? statusConfig["completed"];
               return (
                 <motion.tr
                   key={task.id}
@@ -193,7 +167,6 @@ export function TaskList({ showFailed = true, showSelfHealed = true, onNavigate 
                       variant={statusInfo.variant} 
                       className={`flex items-center gap-1 w-fit ${statusInfo.bg} border-0 ${statusInfo.color}`}
                     >
-                      <StatusIcon className="w-3 h-3" />
                       {statusInfo.label}
                     </Badge>
                   </TableCell>

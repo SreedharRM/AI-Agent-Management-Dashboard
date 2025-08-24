@@ -53,8 +53,15 @@
       target: 'esnext',
       outDir: 'build',
     },
-    server: {
-      port: 3000,
-      open: true,
+      server: {
+    port: 3000,
+    open: true,
+    proxy: {
+      "/api": {
+        target: "https://api.agentmail.to",  // the remote API
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""), // strip "/api"
+      },
     },
+  },
   });

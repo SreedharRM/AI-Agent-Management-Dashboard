@@ -18,19 +18,13 @@ const integrations: Integration[] = [
     description: 'Workflow automation'
   },
   {
-    name: 'Kernel',
+    name: 'Convex',
     status: 'connected',
     icon: '⚡',
     description: 'AI processing'
   },
   {
-    name: 'Interfere',
-    status: 'active',
-    icon: '🔄',
-    description: 'Data sync'
-  },
-  {
-    name: 'Nozomio',
+    name: 'BrowserUse',
     status: 'connected',
     icon: '🧠',
     description: 'Smart contracts'
@@ -41,12 +35,6 @@ const integrations: Integration[] = [
     icon: '📧',
     description: 'Email automation'
   },
-  {
-    name: 'Autumn',
-    status: 'connected',
-    icon: '💳',
-    description: 'Payment processing'
-  }
 ];
 
 const statusConfig = {

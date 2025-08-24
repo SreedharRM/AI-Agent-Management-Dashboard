@@ -9,47 +9,65 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Search, Filter, Plus, CheckSquare, Clock, Zap, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 interface TasksScreenProps {
   onNavigate?: (screen: string) => void;
 }
 
 export function TasksScreen({ onNavigate }: TasksScreenProps) {
-  const [showFailed, setShowFailed] = useState(true);
+
+    // ✅ Move useQuery inside the component
+    // Inside TasksScreen component
+
+// ✅ Real-time tasks (already coming from Convex useQuery)
+const taskList = useQuery(api.tasks.getAllTasks);
+const tasks = taskList ?? [];
+console.log("Fetched tasks:", tasks);
+
+// ✅ Compute stats dynamically
+const totalTasks = tasks.length;
+const inProgress = tasks.filter((t: any) => t.status === "in-progress").length;
+const selfHealed = tasks.filter((t: any) => t.status === "self-healed").length;
+const failed = tasks.filter((t: any) => t.status === "failed").length;
+
+const stats = [
+  {
+    label: "Total Tasks",
+    value: totalTasks,
+    icon: CheckSquare,
+    color: "text-blue-600",
+    gradient: "gradient-primary"
+  },
+  {
+    label: "In Progress",
+    value: inProgress,
+    icon: Clock,
+    color: "text-yellow-600",
+    gradient: "gradient-warning"
+  },
+  {
+    label: "Self-Healed",
+    value: selfHealed,
+    icon: Zap,
+    color: "text-green-600",
+    gradient: "gradient-success"
+  },
+  {
+    label: "Failed",
+    value: failed,
+    icon: AlertTriangle,
+    color: "text-red-600",
+    gradient: "gradient-danger"
+  }
+];
+
+  const [showFailed, setShowFailed] = useState(false);
   const [showSelfHealed, setShowSelfHealed] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const stats = [
-    {
-      label: 'Total Tasks',
-      value: '45',
-      icon: CheckSquare,
-      color: 'text-blue-600',
-      gradient: 'gradient-primary'
-    },
-    {
-      label: 'In Progress',
-      value: '8',
-      icon: Clock,
-      color: 'text-yellow-600',
-      gradient: 'gradient-warning'
-    },
-    {
-      label: 'Self-Healed',
-      value: '3',
-      icon: Zap,
-      color: 'text-green-600',
-      gradient: 'gradient-success'
-    },
-    {
-      label: 'Failed',
-      value: '2',
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      gradient: 'gradient-danger'
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-blue-950 dark:to-purple-950">
@@ -172,15 +190,6 @@ export function TasksScreen({ onNavigate }: TasksScreenProps) {
                   <Label htmlFor="show-failed" className="text-sm">Show Failed</Label>
                 </div>
 
-                {/* Show Self-Healed Toggle */}
-                <div className="flex items-center space-x-2 p-3 bg-white/50 dark:bg-black/20 rounded-lg backdrop-blur-sm">
-                  <Switch
-                    id="show-self-healed"
-                    checked={showSelfHealed}
-                    onCheckedChange={setShowSelfHealed}
-                  />
-                  <Label htmlFor="show-self-healed" className="text-sm">Show Self-Healed</Label>
-                </div>
               </div>
             </CardContent>
           </Card>

@@ -20,7 +20,9 @@ import { LogsScreen } from './components/LogsScreen';
 import { ApprovalsScreen } from './components/ApprovalsScreen';
 import { SettingsScreen } from './components/SettingsScreen';
 import { MailScreen } from './components/MailScreen';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
 
 const navigationItems = [
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -32,6 +34,7 @@ const navigationItems = [
 ];
 
 export default function App() {
+  const tasks = useQuery(api.tasks.getAllTasks); // now works under provider
   const [activeScreen, setActiveScreen] = useState('dashboard');
   const [darkMode, setDarkMode] = useState(false);
 
@@ -83,12 +86,12 @@ export default function App() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center gradient-primary shadow-lg">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-2 h-10 rounded-xl flex items-center justify-center ">
+              
             </div>
             <div>
               <h3 className="font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                AI Agent Hub
+                AImploy
               </h3>
               <p className="text-xs text-muted-foreground">Intelligent Automation</p>
             </div>
